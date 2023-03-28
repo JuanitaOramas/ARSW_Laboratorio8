@@ -1,5 +1,6 @@
 var app = (function () {
 
+
     class Point{
         constructor(x,y){
             this.x=x;
@@ -16,6 +17,10 @@ var app = (function () {
         ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
         ctx.stroke();
     };
+
+    var addNewPoints = function (pnt) {
+        stompClient.send("/topic/newpoint", {}, JSON.stringify(pnt));
+    }
     
     
     var getMousePosition = function (evt) {
@@ -56,9 +61,10 @@ var app = (function () {
         },
 
         publishPoint: function(px,py){
-            var pt=new Point(px,py);
+            var pt = new Point(px,py);
             console.info("publishing point at "+pt);
             addPointToCanvas(pt);
+            addNewPoints(pt);
 
             //publicar el evento
         },
