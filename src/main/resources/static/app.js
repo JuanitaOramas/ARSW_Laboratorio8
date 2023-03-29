@@ -56,7 +56,8 @@ var app = (function () {
 
         connect: function (dibujoid) {
             var can = document.getElementById("canvas");
-            topico = "/topic/newpoint."+dibujoid;
+            // topico = "/topic/newpoint."+dibujoid;
+            topico = "/app/newpoint."+dibujoid;
             //websocket connection
             connectAndSubscribe();
             alert("Dibujo Número: "+dibujoid);
