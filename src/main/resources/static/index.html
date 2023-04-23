@@ -31,8 +31,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <body onload="app.init()">
         <div>
-            <input id="dibujoid" type="number">
-            <button onclick="app.connect($('#dibujoid').val())">Connect</button>
+            <select class="box" id="connectBox">
+                <option value="/newpoint.">
+                    Dibujo
+                </option>
+                <option value="/newpolygon.">
+                    Polígono
+                </option>
+            </select>
+            <input id="drawId" type="number">
+            <button onclick="app.connect($('#drawId').val())">Connect</button>
         </div>
         X:<input id="x" type="number"/>
         Y:<input id="y" type="number"/>        
