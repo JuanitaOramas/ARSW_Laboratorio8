@@ -6,12 +6,12 @@ var app = (function () {
         constructor(x,y){
             this.x=x;
             this.y=y;
-        }        
+        }
     }
-    
+
     var stompClient = null;
 
-    var addPointToCanvas = function (point) {        
+    var addPointToCanvas = function (point) {
         var canvas = document.getElementById("canvas");
         var ctx = canvas.getContext("2d");
         ctx.beginPath();
@@ -19,11 +19,7 @@ var app = (function () {
         ctx.stroke();
     };
 
-    var addNewPoints = function (pnt) {
-        stompClient.send(topico, {}, JSON.stringify(pnt));
-    }
-    
-    
+
     var getMousePosition = function (evt) {
         canvas = document.getElementById("canvas");
         var rect = canvas.getBoundingClientRect();
@@ -33,18 +29,46 @@ var app = (function () {
         };
     };
 
+    var addPolygonToCanvas = function(points){
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle='#f00';
+        ctx.beginPath();
+        for (let i = 1; i < points.length; i++) {
+             ctx.moveTo(points[i - 1].x, points[i - 1].y);
+             ctx.lineTo(points[i].x, points[i].y);
+              if (i === points.length - 1) {
+                  ctx.moveTo(points[i].x, points[i].y);
+                  ctx.lineTo(points[0].x, points[0].y);
+              }
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    };
+
+    var addPointToTopic = function(point){
+        stompClient.send("/app"+topic, {}, JSON.stringify(point));
+//        console.log("funciona"+point);
+    };
+
     var connectAndSubscribe = function () {
         console.info('Connecting to WS...');
         var socket = new SockJS('/stompendpoint');
         stompClient = Stomp.over(socket);
-        
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
-            stompClient.subscribe(topico, function (eventbody) {
-                // alert(eventbody)
-                var point=JSON.parse(eventbody.body);
-                addPointToCanvas(point);
+            stompClient.subscribe("/topic"+topic, function (eventbody) {
+//                var point=JSON.parse(eventbody.body);
+                if (topic.includes("newpoint")) {
+                    var point = JSON.parse(eventbody.body);
+                    addPointToCanvas(point);
+                }
+                else{
+                    addPolygonToCanvas(JSON.parse(eventbody.body));
+                }
+
             });
         });
 
@@ -54,28 +78,28 @@ var app = (function () {
 
     return {
 
-        connect: function (dibujoid) {
+        connect: function (drawId) {
             var can = document.getElementById("canvas");
-            // topico = "/topic/newpoint."+dibujoid;
-            topico = "/app/newpoint."+dibujoid;
-            //websocket connection
+            var option = document.getElementById("connectBox");
+            topic = option.value + drawId;
             connectAndSubscribe();
-            alert("Dibujo Número: "+dibujoid);
-            if(window.PointerEvent){
-                can.addEventListener("pointerdown",function(evt){
-                    var pt = getMousePosition(evt);
-                    addPointToCanvas(pt);
-                    addNewPoints(pt);
-                })
+            alert("Dibujo No"+drawId);
+            if(topic.includes("newpoint")){
+                if(window.PointerEvent){
+                    can.addEventListener("pointerdown",function(evt){
+                        var pt = getMousePosition(evt);
+                        addPointToCanvas(pt);
+                        addPointToTopic(pt);
+                    })
+                }
             }
         },
 
         publishPoint: function(px,py){
-            var pt = new Point(px,py);
+            var pt=new Point(px,py);
             console.info("publishing point at "+pt);
             addPointToCanvas(pt);
-            addNewPoints(pt);
-
+            addPointToTopic(pt);
             //publicar el evento
         },
 
