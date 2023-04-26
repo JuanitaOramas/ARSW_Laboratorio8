@@ -7,6 +7,19 @@
     <artifactId>websockets-msbroker-example</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
+         
+         <repositories>
+    <repository>
+        <id>spring-releases</id>
+        <url>http://repo.spring.io/libs-release</url>
+    </repository>
+</repositories>
+<pluginRepositories>
+    <pluginRepository>
+        <id>spring-releases</id>
+        <url>http://repo.spring.io/libs-release</url>
+    </pluginRepository>
+</pluginRepositories>
 
     <name>websockets-msbroker-example</name>
     <description>Demo project for Spring Boot</description>
@@ -114,6 +127,8 @@
     </dependency>
     </dependencies>
 
+         
+         
     <build>
         <plugins>
             <plugin>
